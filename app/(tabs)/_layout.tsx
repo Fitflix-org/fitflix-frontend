@@ -1,24 +1,35 @@
 import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
 import { Tabs } from 'expo-router';
-import { useColorScheme } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
-import { Colors } from '../../constants/Colors';
 
 function TabBarIcon(props: {
   name: React.ComponentProps<typeof FontAwesome5>['name'];
   color: string;
+  size?: number;
 }) {
-  return <FontAwesome5 size={24} style={{ marginBottom: -3 }} {...props} />;
+  return <FontAwesome5 size={props.size || 24} style={{ marginBottom: -3 }} {...props} />;
 }
 
 export default function TabLayout() {
-  const colorScheme = useColorScheme();
-
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
-        tabBarStyle: { paddingBottom: 5 },
+        tabBarActiveTintColor: '#FFD700',
+        tabBarInactiveTintColor: '#666',
+        tabBarStyle: { 
+          backgroundColor: '#111827',
+          borderTopColor: '#FFD700',
+          borderTopWidth: 1,
+          height: 65,
+          paddingBottom: 10,
+        },
+        headerShown: false,
+        tabBarLabelStyle: { 
+          fontSize: 12, 
+          fontWeight: '600',
+          marginTop: -5,
+        },
       }}>
       <Tabs.Screen
         name="home"
@@ -28,26 +39,56 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="workouts"
+        name="dashboard"
         options={{
-          title: 'Workouts',
-          tabBarIcon: ({ color }) => <TabBarIcon name="dumbbell" color={color} />,
+          title: 'Dashboard',
+          tabBarIcon: ({ color }) => <TabBarIcon name="chart-line" color={color} />,
         }}
       />
       <Tabs.Screen
-        name="nutrition"
+        name="fitty"
         options={{
-          title: 'Nutrition',
-          tabBarIcon: ({ color }) => <TabBarIcon name="apple-alt" color={color} />,
+          title: 'FITTY',
+          tabBarIcon: ({ color }) => (
+            <View style={styles.centerButton}>
+              <TabBarIcon name="robot" color="#111827" size={28} />
+            </View>
+          ),
         }}
       />
       <Tabs.Screen
-        name="profile"
+        name="rewards"
         options={{
-          title: 'Profile',
-          tabBarIcon: ({ color }) => <TabBarIcon name="user-alt" color={color} />,
+          title: 'Reward',
+          tabBarIcon: ({ color }) => <TabBarIcon name="gift" color={color} />,
         }}
       />
+      <Tabs.Screen
+        name="more"
+        options={{
+          title: 'More',
+          tabBarIcon: ({ color }) => <TabBarIcon name="ellipsis-h" color={color} />,
+        }}
+      />
+
     </Tabs>
   );
 }
+
+const styles = StyleSheet.create({
+  centerButton: {
+    width: 60,
+    height: 60,
+    backgroundColor: '#FFD700',
+    borderRadius: 30,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 30,
+    borderWidth: 3,
+    borderColor: '#111827',
+    shadowColor: '#FFD700',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 5,
+    elevation: 5,
+  },});

@@ -1,4 +1,5 @@
 import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
+import { router } from 'expo-router';
 import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 type DiscoverItem = {
@@ -19,27 +20,15 @@ type GymLocation = {
 };
 
 const discoverItems: DiscoverItem[] = [
-  { id: '1', title: 'WTF GYM', icon: 'map-marker-alt' },
-  { id: '2', title: 'Schedule', icon: 'calendar-alt' },
-  { id: '3', title: 'DIGI-GYM', icon: 'video' },
-  { 
-    id: '4', 
-    title: 'Personal Training', 
-    icon: 'user-friends',
-    comingSoon: true 
-  },
-  { 
-    id: '5', 
-    title: 'Fitness Activity', 
-    icon: 'running',
-    comingSoon: true 
-  },
-  { 
-    id: '6', 
-    title: 'Diet & Nutrition', 
-    icon: 'apple-alt',
-    comingSoon: true 
-  },
+  { id: '1', title: 'Online Training', icon: 'video' },
+  { id: '2', title: 'Discover Gyms', icon: 'map-marker-alt' },
+  { id: '3', title: 'Personal Training', icon: 'user-friends' },
+  { id: '4', title: 'Diet & Nutrition', icon: 'apple-alt' },
+  { id: '5', title: 'FitFlix Store', icon: 'shopping-bag' },
+  { id: '6', title: 'Fitness Events', icon: 'calendar-check' },
+  { id: '7', title: 'Schedule', icon: 'calendar-alt' },
+  { id: '8', title: 'Leaderboard', icon: 'trophy' },
+  { id: '9', title: 'Fitness Activity', icon: 'running' }
 ];
 
 const nearbyGyms: GymLocation[] = [
@@ -78,19 +67,29 @@ export default function HomeScreen() {
       {/* Header Section */}
       <View style={styles.header}>
         <View style={styles.userInfo}>
-          <Image 
-            source={{ uri: 'https://via.placeholder.com/40' }}
-            style={styles.avatar}
-          />
+          <TouchableOpacity style={styles.avatarContainer}>
+            <Image 
+              source={{ uri: 'https://via.placeholder.com/40' }}
+              style={styles.avatar}
+            />
+            <View style={styles.onlineIndicator} />
+          </TouchableOpacity>
           <View>
-            <Text style={styles.welcomeText}>Welcome</Text>
-            <Text style={styles.username}>srujan</Text>
+            <Text style={styles.welcomeText}>Welcome back,</Text>
+            <Text style={styles.username}>Srujan</Text>
           </View>
         </View>
-        <TouchableOpacity style={styles.supportButton}>
-          <FontAwesome5 name="comment" size={20} color="#000" />
-          <Text style={styles.supportText}>Support</Text>
-        </TouchableOpacity>
+        <View style={styles.headerActions}>
+          <TouchableOpacity style={styles.iconButton}>
+            <FontAwesome5 name="bell" size={20} color="#000" solid />
+            <View style={styles.notificationBadge}>
+              <Text style={styles.badgeText}>2</Text>
+            </View>
+          </TouchableOpacity>
+          <TouchableOpacity style={[styles.iconButton, styles.supportButton]}>
+            <FontAwesome5 name="comment" size={20} color="#000" />
+          </TouchableOpacity>
+        </View>
       </View>
 
       {/* Special Price Banner */}
@@ -110,7 +109,15 @@ export default function HomeScreen() {
         <Text style={styles.sectionTitle}>Discover</Text>
         <View style={styles.discoverGrid}>
           {discoverItems.map(item => (
-            <TouchableOpacity key={item.id} style={styles.discoverItem}>
+            <TouchableOpacity 
+              key={item.id} 
+              style={styles.discoverItem}
+              onPress={() => {
+                if (item.id === '4') {
+                  router.push('/nutrition');
+                }
+              }}
+            >
               <FontAwesome5 name={item.icon} size={24} color="#FF0000" />
               <Text style={styles.discoverItemTitle}>{item.title}</Text>
               {item.comingSoon && (
@@ -128,7 +135,7 @@ export default function HomeScreen() {
             <Text style={styles.sectionTitle}>Popular Nearby Gyms</Text>
             <Text style={styles.sectionSubtitle}>Explore our well equipped popular gyms</Text>
           </View>
-          <TouchableOpacity>
+          <TouchableOpacity onPress={() => router.push('/gyms')}>
             <Text style={styles.viewAll}>View All</Text>
           </TouchableOpacity>
         </View>
@@ -189,42 +196,84 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
+    paddingTop: 65,
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    padding: 20,
+    paddingHorizontal: 20,
+    paddingVertical: 20,
   },
   userInfo: {
     flexDirection: 'row',
     alignItems: 'center',
   },
+  avatarContainer: {
+    position: 'relative',
+    marginRight: 12,
+  },
   avatar: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    marginRight: 10,
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    borderWidth: 2,
+    borderColor: '#E0E0E0',
+  },
+  onlineIndicator: {
+    position: 'absolute',
+    right: 0,
+    bottom: 0,
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    backgroundColor: '#4CAF50',
+    borderWidth: 2,
+    borderColor: '#fff',
   },
   welcomeText: {
     fontSize: 14,
     color: '#666',
+    marginBottom: 2,
   },
   username: {
-    fontSize: 16,
-    fontWeight: 'bold',
+    fontSize: 20,
+    fontWeight: '700',
+    color: '#1a1a1a',
   },
-  supportButton: {
+  headerActions: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#E8F5E9',
-    padding: 10,
-    borderRadius: 20,
-    gap: 5,
   },
-  supportText: {
-    color: '#000',
-    fontWeight: '500',
+  iconButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#f5f5f5',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginLeft: 10,
+  },
+  supportButton: {
+    backgroundColor: '#e8f5e9',
+  },
+  notificationBadge: {
+    position: 'absolute',
+    top: -5,
+    right: -5,
+    backgroundColor: '#f44336',
+    borderRadius: 10,
+    minWidth: 20,
+    height: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: '#fff',
+  },
+  badgeText: {
+    color: '#fff',
+    fontSize: 12,
+    fontWeight: '600',
   },
   banner: {
     backgroundColor: '#0000FF',
