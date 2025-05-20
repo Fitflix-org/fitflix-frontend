@@ -66,19 +66,12 @@ export default function HomeScreen() {
     <ScrollView style={styles.container}>
       {/* Header Section */}
       <View style={styles.header}>
-        <View style={styles.userInfo}>
-          <TouchableOpacity style={styles.avatarContainer}>
-            <Image 
-              source={{ uri: 'https://via.placeholder.com/40' }}
-              style={styles.avatar}
-            />
-            <View style={styles.onlineIndicator} />
-          </TouchableOpacity>
-          <View>
-            <Text style={styles.welcomeText}>Welcome back,</Text>
-            <Text style={styles.username}>Srujan</Text>
-          </View>
-        </View>
+        <TouchableOpacity 
+          style={styles.loginButton}
+          onPress={() => router.push('/auth/login')}
+        >
+          <Text style={styles.loginButtonText}>Login</Text>
+        </TouchableOpacity>
         <View style={styles.headerActions}>
           <TouchableOpacity style={styles.iconButton}>
             <FontAwesome5 name="bell" size={20} color="#000" solid />
@@ -205,41 +198,17 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 20,
   },
-  userInfo: {
-    flexDirection: 'row',
-    alignItems: 'center',
+  loginButton: {
+    backgroundColor: '#FF0000',
+    paddingVertical: 8,
+    paddingHorizontal: 20,
+    borderRadius: 20,
+    marginRight: 10,
   },
-  avatarContainer: {
-    position: 'relative',
-    marginRight: 12,
-  },
-  avatar: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    borderWidth: 2,
-    borderColor: '#E0E0E0',
-  },
-  onlineIndicator: {
-    position: 'absolute',
-    right: 0,
-    bottom: 0,
-    width: 12,
-    height: 12,
-    borderRadius: 6,
-    backgroundColor: '#4CAF50',
-    borderWidth: 2,
-    borderColor: '#fff',
-  },
-  welcomeText: {
-    fontSize: 14,
-    color: '#666',
-    marginBottom: 2,
-  },
-  username: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: '#1a1a1a',
+  loginButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
   headerActions: {
     flexDirection: 'row',

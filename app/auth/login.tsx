@@ -1,5 +1,5 @@
 import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
-import { Link } from 'expo-router';
+import { Link, router } from 'expo-router';
 import { useState } from 'react';
 import { Image, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
@@ -13,6 +13,14 @@ export default function LoginScreen() {
 
   return (
     <View style={styles.container}>
+      <View style={styles.navigationBar}>
+        <TouchableOpacity 
+          style={styles.backButton}
+          onPress={() => router.back()}
+        >
+          <FontAwesome5 name="arrow-left" size={20} color="#000" />
+        </TouchableOpacity>
+      </View>
       <View style={styles.header}>
         <Image
           style={styles.logo}
@@ -62,6 +70,16 @@ export default function LoginScreen() {
 }
 
 const styles = StyleSheet.create({
+  navigationBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingTop: 20,
+    paddingBottom: 10,
+  },
+  backButton: {
+    padding: 8,
+  },
   container: {
     flex: 1,
     backgroundColor: '#fff',
