@@ -1,21 +1,15 @@
 import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
-import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { useState } from 'react';
+import { Image, Modal, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
 const healthyMeals = [
+  // Early Morning (10 items)
   {
     id: '1',
     title: "Soaked Dry Fruits",
     calories: 64.6,
     image: "placeholder-image.png",
     category: 'Early Morning'
-  },
-  {
-    id: '2',
-    title: "Low Fat Milk",
-    calories: 0.4,
-    image: "placeholder-image.png",
-    category: 'Mid Morning Snacks',
-    tag: 'TONED LOW FAT'
   },
   {
     id: '3',
@@ -30,12 +24,599 @@ const healthyMeals = [
     calories: 14.8,
     image: "placeholder-image.png",
     category: 'Early Morning'
+  },
+  {
+    id: '10',
+    title: 'Lemon Water with Honey',
+    calories: 25.5,
+    image: "placeholder-image.png",
+    category: 'Early Morning'
+  },
+  {
+    id: '11',
+    title: 'Chia Seeds Water',
+    calories: 35.2,
+    image: "placeholder-image.png",
+    category: 'Early Morning'
+  },
+  {
+    id: '12',
+    title: 'Aloe Vera Juice',
+    calories: 42.0,
+    image: "placeholder-image.png",
+    category: 'Early Morning'
+  },
+  {
+    id: '13',
+    title: 'Amla Juice',
+    calories: 33.7,
+    image: "placeholder-image.png",
+    category: 'Early Morning'
+  },
+  {
+    id: '14',
+    title: 'Fenugreek Water',
+    calories: 18.3,
+    image: "placeholder-image.png",
+    category: 'Early Morning'
+  },
+  {
+    id: '15',
+    title: 'Cinnamon Water',
+    calories: 12.5,
+    image: "placeholder-image.png",
+    category: 'Early Morning'
+  },
+  {
+    id: '16',
+    title: 'Cumin Water',
+    calories: 15.8,
+    image: "placeholder-image.png",
+    category: 'Early Morning'
+  },
+
+  // Breakfast (10 items)
+  {
+    id: '17',
+    title: 'Oatmeal with Fruits',
+    calories: 245.0,
+    image: "placeholder-image.png",
+    category: 'Breakfast'
+  },
+  {
+    id: '18',
+    title: 'Vegetable Poha',
+    calories: 178.5,
+    image: "placeholder-image.png",
+    category: 'Breakfast'
+  },
+  {
+    id: '19',
+    title: 'Multigrain Toast with Avocado',
+    calories: 210.3,
+    image: "placeholder-image.png",
+    category: 'Breakfast'
+  },
+  {
+    id: '20',
+    title: 'Idli with Sambar',
+    calories: 165.8,
+    image: "placeholder-image.png",
+    category: 'Breakfast'
+  },
+  {
+    id: '21',
+    title: 'Vegetable Upma',
+    calories: 185.2,
+    image: "placeholder-image.png",
+    category: 'Breakfast'
+  },
+  {
+    id: '22',
+    title: 'Egg White Omelette',
+    calories: 155.0,
+    image: "placeholder-image.png",
+    category: 'Breakfast'
+  },
+  {
+    id: '23',
+    title: 'Besan Chilla',
+    calories: 170.6,
+    image: "placeholder-image.png",
+    category: 'Breakfast'
+  },
+  {
+    id: '24',
+    title: 'Sprouts Salad',
+    calories: 120.8,
+    image: "placeholder-image.png",
+    category: 'Breakfast'
+  },
+  {
+    id: '25',
+    title: 'Ragi Dosa',
+    calories: 145.3,
+    image: "placeholder-image.png",
+    category: 'Breakfast'
+  },
+  {
+    id: '26',
+    title: 'Paneer Paratha',
+    calories: 230.5,
+    image: "placeholder-image.png",
+    category: 'Breakfast'
+  },
+
+  // Mid Morning Snacks (10 items)
+  {
+    id: '2',
+    title: "Low Fat Milk",
+    calories: 0.4,
+    image: "placeholder-image.png",
+    category: 'Mid Morning Snacks',
+    tag: 'TONED LOW FAT'
+  },
+  {
+    id: '27',
+    title: 'Apple Slices with Peanut Butter',
+    calories: 160.2,
+    image: "placeholder-image.png",
+    category: 'Mid Morning Snacks'
+  },
+  {
+    id: '28',
+    title: 'Roasted Chana',
+    calories: 120.5,
+    image: "placeholder-image.png",
+    category: 'Mid Morning Snacks'
+  },
+  {
+    id: '29',
+    title: 'Buttermilk',
+    calories: 70.3,
+    image: "placeholder-image.png",
+    category: 'Mid Morning Snacks'
+  },
+  {
+    id: '30',
+    title: 'Coconut Water',
+    calories: 45.6,
+    image: "placeholder-image.png",
+    category: 'Mid Morning Snacks'
+  },
+  {
+    id: '31',
+    title: 'Handful of Mixed Nuts',
+    calories: 170.8,
+    image: "placeholder-image.png",
+    category: 'Mid Morning Snacks'
+  },
+  {
+    id: '32',
+    title: 'Vegetable Sandwich',
+    calories: 145.2,
+    image: "placeholder-image.png",
+    category: 'Mid Morning Snacks'
+  },
+  {
+    id: '33',
+    title: 'Fruit Yogurt',
+    calories: 110.5,
+    image: "placeholder-image.png",
+    category: 'Mid Morning Snacks'
+  },
+  {
+    id: '34',
+    title: 'Protein Shake',
+    calories: 130.0,
+    image: "placeholder-image.png",
+    category: 'Mid Morning Snacks'
+  },
+  {
+    id: '35',
+    title: 'Cucumber and Carrot Sticks',
+    calories: 45.2,
+    image: "placeholder-image.png",
+    category: 'Mid Morning Snacks'
+  },
+
+  // Lunch (10 items)
+  {
+    id: '5',
+    title: 'Grilled Chicken Salad',
+    calories: 320,
+    image: "placeholder-image.png",
+    category: 'Lunch'
+  },
+  {
+    id: '6',
+    title: 'Quinoa Bowl',
+    calories: 280,
+    image: "placeholder-image.png",
+    category: 'Lunch'
+  },
+  {
+    id: '36',
+    title: 'Brown Rice with Dal and Vegetables',
+    calories: 340.5,
+    image: "placeholder-image.png",
+    category: 'Lunch'
+  },
+  {
+    id: '37',
+    title: 'Roti with Paneer Curry',
+    calories: 380.2,
+    image: "placeholder-image.png",
+    category: 'Lunch'
+  },
+  {
+    id: '38',
+    title: 'Vegetable Khichdi',
+    calories: 290.6,
+    image: "placeholder-image.png",
+    category: 'Lunch'
+  },
+  {
+    id: '39',
+    title: 'Grilled Fish with Steamed Vegetables',
+    calories: 310.8,
+    image: "placeholder-image.png",
+    category: 'Lunch'
+  },
+  {
+    id: '40',
+    title: 'Rajma Chawal',
+    calories: 360.3,
+    image: "placeholder-image.png",
+    category: 'Lunch'
+  },
+  {
+    id: '41',
+    title: 'Vegetable Pulao',
+    calories: 325.7,
+    image: "placeholder-image.png",
+    category: 'Lunch'
+  },
+  {
+    id: '42',
+    title: 'Chole with Multigrain Roti',
+    calories: 370.2,
+    image: "placeholder-image.png",
+    category: 'Lunch'
+  },
+  {
+    id: '43',
+    title: 'Lentil Soup with Whole Grain Bread',
+    calories: 295.4,
+    image: "placeholder-image.png",
+    category: 'Lunch'
+  },
+
+  // Snacks (10 items)
+  {
+    id: '7',
+    title: 'Greek Yogurt with Berries',
+    calories: 150,
+    image: "placeholder-image.png",
+    category: 'Snacks'
+  },
+  {
+    id: '44',
+    title: 'Hummus with Vegetable Sticks',
+    calories: 165.3,
+    image: "placeholder-image.png",
+    category: 'Snacks'
+  },
+  {
+    id: '45',
+    title: 'Roasted Makhana',
+    calories: 110.8,
+    image: "placeholder-image.png",
+    category: 'Snacks'
+  },
+  {
+    id: '46',
+    title: 'Sprouts Chaat',
+    calories: 140.2,
+    image: "placeholder-image.png",
+    category: 'Snacks'
+  },
+  {
+    id: '47',
+    title: 'Baked Sweet Potato',
+    calories: 180.5,
+    image: "placeholder-image.png",
+    category: 'Snacks'
+  },
+  {
+    id: '48',
+    title: 'Fruit Smoothie',
+    calories: 170.6,
+    image: "placeholder-image.png",
+    category: 'Snacks'
+  },
+  {
+    id: '49',
+    title: 'Multigrain Dhokla',
+    calories: 155.3,
+    image: "placeholder-image.png",
+    category: 'Snacks'
+  },
+  {
+    id: '50',
+    title: 'Oats and Nuts Energy Bar',
+    calories: 190.2,
+    image: "placeholder-image.png",
+    category: 'Snacks'
+  },
+  {
+    id: '51',
+    title: 'Roasted Chickpeas',
+    calories: 130.7,
+    image: "placeholder-image.png",
+    category: 'Snacks'
+  },
+  {
+    id: '52',
+    title: 'Vegetable Cutlet',
+    calories: 175.4,
+    image: "placeholder-image.png",
+    category: 'Snacks'
+  },
+
+  // Dinner (10 items)
+  {
+    id: '8',
+    title: 'Baked Salmon with Vegetables',
+    calories: 380,
+    image: "placeholder-image.png",
+    category: 'Dinner'
+  },
+  {
+    id: '53',
+    title: 'Vegetable Soup with Multigrain Bread',
+    calories: 260.5,
+    image: "placeholder-image.png",
+    category: 'Dinner'
+  },
+  {
+    id: '54',
+    title: 'Grilled Tofu with Quinoa',
+    calories: 310.2,
+    image: "placeholder-image.png",
+    category: 'Dinner'
+  },
+  {
+    id: '55',
+    title: 'Roti with Mixed Vegetable Curry',
+    calories: 290.7,
+    image: "placeholder-image.png",
+    category: 'Dinner'
+  },
+  {
+    id: '56',
+    title: 'Palak Paneer with Roti',
+    calories: 340.3,
+    image: "placeholder-image.png",
+    category: 'Dinner'
+  },
+  {
+    id: '57',
+    title: 'Baked Chicken with Steamed Broccoli',
+    calories: 350.8,
+    image: "placeholder-image.png",
+    category: 'Dinner'
+  },
+  {
+    id: '58',
+    title: 'Millet Dosa with Sambar',
+    calories: 270.5,
+    image: "placeholder-image.png",
+    category: 'Dinner'
+  },
+  {
+    id: '59',
+    title: 'Egg Curry with Brown Rice',
+    calories: 330.2,
+    image: "placeholder-image.png",
+    category: 'Dinner'
+  },
+  {
+    id: '60',
+    title: 'Vegetable Daliya',
+    calories: 250.6,
+    image: "placeholder-image.png",
+    category: 'Dinner'
+  },
+  {
+    id: '61',
+    title: 'Mushroom and Spinach Stir Fry',
+    calories: 280.3,
+    image: "placeholder-image.png",
+    category: 'Dinner'
+  },
+
+  // Bed time (10 items)
+  {
+    id: '9',
+    title: 'Warm Milk with Turmeric',
+    calories: 120,
+    image: "placeholder-image.png",
+    category: 'Bed time'
+  },
+  {
+    id: '62',
+    title: 'Chamomile Tea',
+    calories: 5.2,
+    image: "placeholder-image.png",
+    category: 'Bed time'
+  },
+  {
+    id: '63',
+    title: 'Almond Milk',
+    calories: 80.5,
+    image: "placeholder-image.png",
+    category: 'Bed time'
+  },
+  {
+    id: '64',
+    title: 'Banana Smoothie',
+    calories: 150.3,
+    image: "placeholder-image.png",
+    category: 'Bed time'
+  },
+  {
+    id: '65',
+    title: 'Cinnamon and Honey Tea',
+    calories: 45.6,
+    image: "placeholder-image.png",
+    category: 'Bed time'
+  },
+  {
+    id: '66',
+    title: 'Warm Water with Lemon',
+    calories: 10.2,
+    image: "placeholder-image.png",
+    category: 'Bed time'
+  },
+  {
+    id: '67',
+    title: 'Peppermint Tea',
+    calories: 4.8,
+    image: "placeholder-image.png",
+    category: 'Bed time'
+  },
+  {
+    id: '68',
+    title: 'Cottage Cheese with Honey',
+    calories: 130.5,
+    image: "placeholder-image.png",
+    category: 'Bed time'
+  },
+  {
+    id: '69',
+    title: 'Lavender Tea',
+    calories: 3.7,
+    image: "placeholder-image.png",
+    category: 'Bed time'
+  },
+  {
+    id: '70',
+    title: 'Nutmeg Milk',
+    calories: 110.2,
+    image: "placeholder-image.png",
+    category: 'Bed time'
   }
 ];
 
-const mealCategories = ['Early Morning', 'Breakfast', 'Mid Morning Snacks'];
+const mealCategories = ['Early Morning', 'Breakfast', 'Mid Morning Snacks', 'Lunch', 'Snacks', 'Dinner', 'Bed time'];
 
 export default function NutritionScreen() {
+  const [selectedCategory, setSelectedCategory] = useState('Early Morning');
+  const [selectedMeals, setSelectedMeals] = useState({
+    'Early Morning': '',
+    'Breakfast': '',
+    'Mid Morning Snacks': '',
+    'Lunch': '',
+    'Snacks': '',
+    'Dinner': '',
+    'Bed time': ''
+  });
+  const [customMeals, setCustomMeals] = useState({
+    'Early Morning': '',
+    'Breakfast': '',
+    'Mid Morning Snacks': '',
+    'Lunch': '',
+    'Snacks': '',
+    'Dinner': '',
+    'Bed time': ''
+  });
+  const [customCalories, setCustomCalories] = useState({
+    'Early Morning': 0,
+    'Breakfast': 0,
+    'Mid Morning Snacks': 0,
+    'Lunch': 0,
+    'Snacks': 0,
+    'Dinner': 0,
+    'Bed time': 0
+  });
+  const [showMealSelector, setShowMealSelector] = useState(false);
+  const [showCustomInput, setShowCustomInput] = useState(false);
+  const [currentCategory, setCurrentCategory] = useState('');
+  const [customMealName, setCustomMealName] = useState('');
+  const [customMealCalories, setCustomMealCalories] = useState('');
+  
+  // Calculate total calories consumed
+  const calculateTotalCalories = () => {
+    let total = 0;
+    Object.keys(selectedMeals).forEach(category => {
+      if (selectedMeals[category]) {
+        const meal = healthyMeals.find(m => m.id === selectedMeals[category]);
+        if (meal) {
+          total += meal.calories;
+        }
+      }
+      // Add custom meal calories
+      if (customMeals[category] && customCalories[category]) {
+        total += customCalories[category];
+      }
+    });
+    return total.toFixed(1);
+  };
+  
+  // Handle meal selection
+  const handleSelectMeal = (mealId) => {
+    if (mealId === 'custom') {
+      setShowMealSelector(false);
+      setShowCustomInput(true);
+    } else {
+      setSelectedMeals({
+        ...selectedMeals,
+        [currentCategory]: mealId
+      });
+      // Clear custom meal for this category if a predefined meal is selected
+      if (mealId !== '') {
+        setCustomMeals({
+          ...customMeals,
+          [currentCategory]: ''
+        });
+        setCustomCalories({
+          ...customCalories,
+          [currentCategory]: 0
+        });
+      }
+      setShowMealSelector(false);
+    }
+  };
+  
+  // Handle custom meal submission
+  const handleCustomMealSubmit = () => {
+    if (customMealName.trim() && customMealCalories.trim()) {
+      setCustomMeals({
+        ...customMeals,
+        [currentCategory]: customMealName.trim()
+      });
+      setCustomCalories({
+        ...customCalories,
+        [currentCategory]: parseFloat(customMealCalories) || 0
+      });
+      // Clear selected meal for this category
+      setSelectedMeals({
+        ...selectedMeals,
+        [currentCategory]: ''
+      });
+      setCustomMealName('');
+      setCustomMealCalories('');
+      setShowCustomInput(false);
+    }
+  };
+  
+  // Open meal selector modal
+  const openMealSelector = (category) => {
+    setCurrentCategory(category);
+    setShowMealSelector(true);
+  };
+  
   return (
     <ScrollView style={styles.container}>
       <View style={styles.header}>
@@ -130,30 +711,168 @@ export default function NutritionScreen() {
         </View>
       </View>
 
+      <View style={styles.calorieCounterSection}>
+        <Text style={styles.calorieCounterTitle}>Daily Calorie Counter</Text>
+        <View style={styles.calorieCounterCard}>
+          <View style={styles.totalCaloriesContainer}>
+            <Text style={styles.totalCaloriesLabel}>Total Calories Consumed Today</Text>
+            <View style={styles.totalCaloriesValue}>
+              <FontAwesome5 name="fire-alt" size={24} color="#dc2626" />
+              <Text style={styles.calorieNumber}>{calculateTotalCalories()}</Text>
+              <Text style={styles.calorieUnit}>Cal</Text>
+            </View>
+          </View>
+          
+          <Text style={styles.mealSelectionTitle}>Select what you ate today:</Text>
+          
+          <View style={styles.mealSelectionContainer}>
+            {mealCategories.map((category) => (
+              <View key={category} style={styles.mealSelectionRow}>
+                <Text style={styles.mealCategoryLabel}>{category}</Text>
+                <TouchableOpacity 
+                  style={styles.mealSelectorButton}
+                  onPress={() => openMealSelector(category)}
+                >
+                  {selectedMeals[category] ? (
+                    <Text style={styles.selectedMealText}>
+                      {healthyMeals.find(m => m.id === selectedMeals[category])?.title || 'Select'}
+                    </Text>
+                  ) : customMeals[category] ? (
+                    <Text style={styles.selectedMealText}>
+                      {customMeals[category]} ({customCalories[category]} Cal)
+                    </Text>
+                  ) : (
+                    <Text style={styles.mealSelectorText}>Select</Text>
+                  )}
+                  <FontAwesome5 name="chevron-down" size={12} color="#666" />
+                </TouchableOpacity>
+              </View>
+            ))}
+          </View>
+        </View>
+      </View>
+
+      <Modal
+        visible={showMealSelector}
+        transparent={true}
+        animationType="slide"
+        onRequestClose={() => setShowMealSelector(false)}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Select {currentCategory} Item</Text>
+              <TouchableOpacity onPress={() => setShowMealSelector(false)}>
+                <FontAwesome5 name="times" size={20} color="#333" />
+              </TouchableOpacity>
+            </View>
+            
+            <ScrollView style={styles.mealListContainer}>
+              <TouchableOpacity 
+                style={styles.mealListItem}
+                onPress={() => handleSelectMeal('')}
+              >
+                <Text style={styles.mealListItemText}>None</Text>
+              </TouchableOpacity>
+              
+              <TouchableOpacity 
+                style={[styles.mealListItem, styles.customMealItem]}
+                onPress={() => handleSelectMeal('custom')}
+              >
+                <Text style={styles.mealListItemText}>Other (Add custom item)</Text>
+                <FontAwesome5 name="plus" size={14} color="#dc2626" />
+              </TouchableOpacity>
+              
+              {healthyMeals
+                .filter(meal => meal.category === currentCategory)
+                .map(meal => (
+                  <TouchableOpacity 
+                    key={meal.id} 
+                    style={styles.mealListItem}
+                    onPress={() => handleSelectMeal(meal.id)}
+                  >
+                    <Text style={styles.mealListItemText}>{meal.title}</Text>
+                    <Text style={styles.mealListItemCalories}>{meal.calories} Cal</Text>
+                  </TouchableOpacity>
+                ))}
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
+      
+      <Modal
+        visible={showCustomInput}
+        transparent={true}
+        animationType="slide"
+        onRequestClose={() => setShowCustomInput(false)}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Add Custom {currentCategory} Item</Text>
+              <TouchableOpacity onPress={() => setShowCustomInput(false)}>
+                <FontAwesome5 name="times" size={20} color="#333" />
+              </TouchableOpacity>
+            </View>
+            
+            <View style={styles.customInputContainer}>
+              <Text style={styles.customInputLabel}>Food Name:</Text>
+              <TextInput
+                style={styles.customInput}
+                value={customMealName}
+                onChangeText={setCustomMealName}
+                placeholder="Enter food name"
+                placeholderTextColor="#999"
+              />
+              
+              <Text style={styles.customInputLabel}>Calories:</Text>
+              <TextInput
+                style={styles.customInput}
+                value={customMealCalories}
+                onChangeText={setCustomMealCalories}
+                placeholder="Enter calories"
+                placeholderTextColor="#999"
+                keyboardType="numeric"
+              />
+              
+              <TouchableOpacity 
+                style={styles.customSubmitButton}
+                onPress={handleCustomMealSubmit}
+              >
+                <Text style={styles.customSubmitButtonText}>Add Food Item</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+
       <View style={styles.mealsSection}>
         <Text style={styles.mealsTitle}>Healthy Meals To Try</Text>
         <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.categoryScroll}>
           {mealCategories.map((category, index) => (
             <TouchableOpacity 
               key={index} 
-              style={[styles.categoryButton, index === 0 && styles.activeCategoryButton]}
+              style={[styles.categoryButton, selectedCategory === category && styles.activeCategoryButton]}
+              onPress={() => setSelectedCategory(category)}
             >
-              <Text style={[styles.categoryText, index === 0 && styles.activeCategoryText]}>{category}</Text>
+              <Text style={[styles.categoryText, selectedCategory === category && styles.activeCategoryText]}>{category}</Text>
             </TouchableOpacity>
           ))}
         </ScrollView>
         <View style={styles.mealsGrid}>
-          {healthyMeals.map((meal) => (
-            <View key={meal.id} style={styles.mealCard}>
-              <Image source={meal.image} style={styles.mealImage} />
-              {meal.tag && <View style={styles.mealTag}><Text style={styles.tagText}>{meal.tag}</Text></View>}
-              <Text style={styles.mealTitle}>{meal.title}</Text>
-              <View style={styles.calorieInfo}>
-                <FontAwesome5 name="fire-alt" size={16} color="#dc2626" />
-                <Text style={styles.calorieText}>{meal.calories} Cal</Text>
+          {healthyMeals
+            .filter(meal => meal.category === selectedCategory)
+            .map((meal) => (
+              <View key={meal.id} style={styles.mealCard}>
+                <Image source={meal.image} style={styles.mealImage} />
+                {meal.tag && <View style={styles.mealTag}><Text style={styles.tagText}>{meal.tag}</Text></View>}
+                <Text style={styles.mealTitle}>{meal.title}</Text>
+                <View style={styles.calorieInfo}>
+                  <FontAwesome5 name="fire-alt" size={16} color="#dc2626" />
+                  <Text style={styles.calorieText}>{meal.calories} Cal</Text>
+                </View>
               </View>
-            </View>
-          ))}
+            ))}
         </View>
       </View>
     </ScrollView>
@@ -161,6 +880,164 @@ export default function NutritionScreen() {
 }
 
 const styles = StyleSheet.create({
+  // Calorie Counter Styles
+  calorieCounterSection: {
+    padding: 20,
+  },
+  calorieCounterTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#333',
+    marginBottom: 15,
+  },
+  calorieCounterCard: {
+    backgroundColor: '#fff',
+    borderRadius: 15,
+    padding: 20,
+  },
+  totalCaloriesContainer: {
+    alignItems: 'center',
+    marginBottom: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: '#f0f0f0',
+    paddingBottom: 20,
+  },
+  totalCaloriesLabel: {
+    fontSize: 16,
+    color: '#666',
+    marginBottom: 10,
+  },
+  totalCaloriesValue: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  calorieNumber: {
+    fontSize: 32,
+    fontWeight: 'bold',
+    color: '#333',
+    marginLeft: 10,
+  },
+  calorieUnit: {
+    fontSize: 18,
+    color: '#666',
+    marginLeft: 5,
+  },
+  mealSelectionTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#333',
+    marginBottom: 15,
+  },
+  mealSelectionContainer: {
+    marginBottom: 10,
+  },
+  mealSelectionRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 15,
+  },
+  mealCategoryLabel: {
+    fontSize: 14,
+    color: '#333',
+    flex: 1,
+  },
+  mealSelectorButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: '#f5f5f5',
+    padding: 10,
+    borderRadius: 8,
+    flex: 2,
+  },
+  mealSelectorText: {
+    color: '#999',
+  },
+  selectedMealText: {
+    color: '#333',
+    flex: 1,
+    marginRight: 5,
+  },
+  // Modal Styles
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'flex-end',
+    backgroundColor: 'rgba(0,0,0,0.5)',
+  },
+  modalContent: {
+    backgroundColor: '#fff',
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    padding: 20,
+    maxHeight: '70%',
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 20,
+    paddingBottom: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: '#f0f0f0',
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#333',
+  },
+  mealListContainer: {
+    maxHeight: '80%',
+  },
+  mealListItem: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: '#f0f0f0',
+  },
+  customMealItem: {
+    backgroundColor: '#f9f9f9',
+  },
+  mealListItemText: {
+    fontSize: 16,
+    color: '#333',
+  },
+  mealListItemCalories: {
+    fontSize: 14,
+    color: '#dc2626',
+  },
+  // Custom Input Styles
+  customInputContainer: {
+    padding: 10,
+  },
+  customInputLabel: {
+    fontSize: 16,
+    color: '#333',
+    marginBottom: 8,
+    fontWeight: '600',
+  },
+  customInput: {
+    backgroundColor: '#f5f5f5',
+    borderRadius: 8,
+    padding: 12,
+    marginBottom: 16,
+    fontSize: 16,
+    color: '#333',
+  },
+  customSubmitButton: {
+    backgroundColor: '#dc2626',
+    borderRadius: 8,
+    padding: 15,
+    alignItems: 'center',
+    marginTop: 10,
+  },
+  customSubmitButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
+  },
   container: {
     flex: 1,
     backgroundColor: '#f5f5f5',
