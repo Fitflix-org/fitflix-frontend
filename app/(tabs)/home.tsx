@@ -108,6 +108,8 @@ export default function HomeScreen() {
               onPress={() => {
                 if (item.id === '4') {
                   router.push('/nutrition');
+                } else if (item.id === '2') {
+                  router.push('/gyms');
                 }
               }}
             >
@@ -134,7 +136,11 @@ export default function HomeScreen() {
         </View>
 
         {nearbyGyms.map(gym => (
-          <View key={gym.id} style={styles.gymCard}>
+          <TouchableOpacity 
+            key={gym.id} 
+            style={styles.gymCard}
+            onPress={() => router.push(`/gym-details?id=${gym.id}`)}
+          >
             <Image 
               source={{ uri: 'https://via.placeholder.com/300x200' }}
               style={styles.gymImage}
@@ -152,16 +158,28 @@ export default function HomeScreen() {
               <View style={styles.gymActions}>
                 <Text style={styles.gymPrice}>Starts from {gym.price}</Text>
                 <View style={styles.actionButtons}>
-                  <TouchableOpacity style={styles.freeTrialButton}>
+                  <TouchableOpacity 
+                    style={styles.freeTrialButton}
+                    onPress={(e) => {
+                      e.stopPropagation();
+                      // Handle free trial action
+                    }}
+                  >
                     <Text style={styles.freeTrialText}>First Free Day</Text>
                   </TouchableOpacity>
-                  <TouchableOpacity style={styles.buyButton}>
+                  <TouchableOpacity 
+                    style={styles.buyButton}
+                    onPress={(e) => {
+                      e.stopPropagation();
+                      // Handle buy now action
+                    }}
+                  >
                     <Text style={styles.buyButtonText}>Buy Now</Text>
                   </TouchableOpacity>
                 </View>
               </View>
             </View>
-          </View>
+          </TouchableOpacity>
         ))}
       </View>
 

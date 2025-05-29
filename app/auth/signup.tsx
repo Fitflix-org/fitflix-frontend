@@ -1,7 +1,7 @@
 import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
 import { Link } from 'expo-router';
 import { useState } from 'react';
-import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Image, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
 export default function SignupScreen() {
   const [name, setName] = useState('');
@@ -13,19 +13,22 @@ export default function SignupScreen() {
   const handleSignup = () => {
     // TODO: Implement signup logic
     console.log('Signup:', { name, email, phone, gender, referralCode });
+    // Navigate to home page after signup
+    router.push('/(tabs)/home');
   };
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
+      <View style={styles.logoContainer}>
         <Image
+          source={require('../../assets/images/icon.png')}
           style={styles.logo}
         />
-        <Text style={styles.title}>Create Account</Text>
-        <Text style={styles.subtitle}>Enter Email Or Phone And Experience The Fitness World.</Text>
       </View>
-
-      <View style={styles.form}>
+      
+      <View style={styles.formContainer}>
+        <Text style={styles.title}>Create Account</Text>
+        
         <View style={styles.inputContainer}>
           <FontAwesome5 name="user" size={20} color="#666" style={styles.inputIcon} />
           <TextInput
@@ -49,16 +52,19 @@ export default function SignupScreen() {
           />
         </View>
 
-        <View style={styles.phoneContainer}>
-          <Text style={styles.countryCode}>+91</Text>
-          <TextInput
-            style={styles.phoneInput}
-            placeholder="999999999"
-            value={phone}
-            onChangeText={setPhone}
-            keyboardType="phone-pad"
-            maxLength={10}
-          />
+        <View style={styles.inputContainer}>
+          <FontAwesome5 name="phone" size={20} color="#666" style={styles.inputIcon} />
+          <View style={styles.phoneInnerContainer}>
+            <Text style={styles.countryCode}>+91</Text>
+            <TextInput
+              style={styles.phoneInput}
+              placeholder="999999999"
+              value={phone}
+              onChangeText={setPhone}
+              keyboardType="phone-pad"
+              maxLength={10}
+            />
+          </View>
         </View>
 
         <Text style={styles.label}>Select Gender</Text>
@@ -67,7 +73,7 @@ export default function SignupScreen() {
             style={[styles.genderButton, gender === 'male' && styles.genderButtonActive]}
             onPress={() => setGender('male')}
           >
-            <FontAwesome5 name="mars" size={20} color={gender === 'male' ? '#FF0000' : '#666'} />
+            <FontAwesome5 name="mars" size={20} color={gender === 'male' ? '#000' : '#666'} />
             <Text style={[styles.genderText, gender === 'male' && styles.genderTextActive]}>Male</Text>
           </TouchableOpacity>
 
@@ -75,7 +81,7 @@ export default function SignupScreen() {
             style={[styles.genderButton, gender === 'female' && styles.genderButtonActive]}
             onPress={() => setGender('female')}
           >
-            <FontAwesome5 name="venus" size={20} color={gender === 'female' ? '#FF0000' : '#666'} />
+            <FontAwesome5 name="venus" size={20} color={gender === 'female' ? '#000' : '#666'} />
             <Text style={[styles.genderText, gender === 'female' && styles.genderTextActive]}>Female</Text>
           </TouchableOpacity>
 
@@ -83,7 +89,7 @@ export default function SignupScreen() {
             style={[styles.genderButton, gender === 'other' && styles.genderButtonActive]}
             onPress={() => setGender('other')}
           >
-            <FontAwesome5 name="transgender" size={20} color={gender === 'other' ? '#FF0000' : '#666'} />
+            <FontAwesome5 name="transgender" size={20} color={gender === 'other' ? '#000' : '#666'} />
             <Text style={[styles.genderText, gender === 'other' && styles.genderTextActive]}>Other</Text>
           </TouchableOpacity>
         </View>
@@ -98,94 +104,93 @@ export default function SignupScreen() {
           />
         </View>
 
-        <TouchableOpacity style={styles.signupButton} onPress={handleSignup}>
-          <Text style={styles.signupButtonText}>Sign Up</Text>
+        <TouchableOpacity style={styles.continueButton} onPress={handleSignup}>
+          <Text style={styles.continueButtonText}>Sign Up</Text>
         </TouchableOpacity>
-
-        <View style={styles.login}>
-          <Text style={styles.loginText}>Already have account? </Text>
-          <Link href="/auth/login" asChild>
-            <TouchableOpacity>
-              <Text style={styles.loginLink}>Login</Text>
-            </TouchableOpacity>
-          </Link>
-        </View>
+        
+        <Text style={styles.termsText}>
+          By clicking Sign Up, you agree to our <Text style={styles.linkText}>Terms of Service</Text>
+          {' '}and <Text style={styles.linkText}>Privacy Policy</Text>
+        </Text>
+      </View>
+      
+      <View style={styles.footer}>
+        <Text style={styles.footerText}>
+          Already have an account? <Link href="/auth/signin" style={styles.signInLink}>Sign in</Link>
+        </Text>
       </View>
     </View>
   );
 }
 
-import { Image } from 'react-native';
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
     padding: 20,
+    justifyContent: 'space-between',
   },
-  header: {
+  logoContainer: {
     alignItems: 'center',
-    marginTop: 40,
-    marginBottom: 30,
+    marginTop: 60,
   },
   logo: {
-    width: 100,
-    height: 100,
+    width: 80,
+    height: 80,
     resizeMode: 'contain',
   },
+  formContainer: {
+    width: '100%',
+    alignItems: 'center',
+  },
   title: {
-    fontSize: 24,
+    fontSize: 28,
     fontWeight: 'bold',
-    marginTop: 20,
-  },
-  subtitle: {
-    fontSize: 14,
-    color: '#666',
-    marginTop: 5,
-    textAlign: 'center',
-  },
-  form: {
-    flex: 1,
+    marginBottom: 30,
+    textAlign: 'left',
+    alignSelf: 'flex-start',
   },
   inputContainer: {
+    width: '100%',
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#f5f5f5',
-    borderRadius: 10,
-    marginBottom: 15,
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 8,
     paddingHorizontal: 15,
+    marginBottom: 15,
+    height: 50,
   },
   inputIcon: {
     marginRight: 10,
   },
   input: {
     flex: 1,
-    padding: 15,
     fontSize: 16,
   },
-  phoneContainer: {
+  phoneInnerContainer: {
+    flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#f5f5f5',
-    borderRadius: 10,
-    marginBottom: 15,
   },
   countryCode: {
-    paddingHorizontal: 15,
     fontSize: 16,
     color: '#666',
+    marginRight: 10,
   },
   phoneInput: {
     flex: 1,
-    padding: 15,
     fontSize: 16,
   },
   label: {
     fontSize: 16,
     fontWeight: 'bold',
     marginBottom: 10,
+    alignSelf: 'flex-start',
   },
   genderContainer: {
+    width: '100%',
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginBottom: 15,
@@ -195,14 +200,15 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#f5f5f5',
-    padding: 15,
-    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: '#ddd',
+    padding: 12,
+    borderRadius: 25,
     marginHorizontal: 5,
     gap: 10,
   },
   genderButtonActive: {
-    backgroundColor: '#FFE5E5',
+    backgroundColor: '#f5f5f5',
   },
   genderText: {
     color: '#666',
@@ -210,30 +216,44 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   genderTextActive: {
-    color: '#FF0000',
+    color: '#000',
   },
-  signupButton: {
-    backgroundColor: '#FF0000',
-    padding: 15,
-    borderRadius: 10,
+  continueButton: {
+    width: '100%',
+    height: 50,
+    backgroundColor: '#000',
+    borderRadius: 25,
+    justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 20,
+    marginBottom: 20,
+    marginTop: 10,
   },
-  signupButtonText: {
+  continueButtonText: {
     color: '#fff',
     fontSize: 16,
     fontWeight: 'bold',
   },
-  login: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    marginTop: 30,
+  termsText: {
+    fontSize: 12,
+    color: '#666',
+    textAlign: 'center',
+    marginTop: 10,
   },
-  loginText: {
+  linkText: {
+    color: '#000',
+    fontWeight: 'bold',
+  },
+  footer: {
+    width: '100%',
+    alignItems: 'center',
+    marginBottom: 30,
+  },
+  footerText: {
+    fontSize: 14,
     color: '#666',
   },
-  loginLink: {
-    color: '#FF0000',
+  signInLink: {
+    color: '#000',
     fontWeight: 'bold',
   },
 });
