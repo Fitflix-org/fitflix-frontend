@@ -1,17 +1,39 @@
-import { Link } from 'expo-router';
-import { useState } from 'react';
+import { useNavigation } from '@react-navigation/native';
+import React, { useState } from 'react';
 import { Image, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
-import { useAuth } from '../../features/auth/auth-context';
+import { useAuth } from '../../hooks/useAuth';
 
 export default function LoginScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
+  
+  const navigation = useNavigation();
   const { login } = useAuth();
 
   const handleLogin = async () => {
-    await login(email, password);
-    console.log('Login with email:', email);
-    console.log('Login with password:', password);
+    if (!email) {
+      setError('Please enter your email');
+      return;
+    }
+    
+    if (!password) {
+      setError('Please enter your password');
+      return;
+    }
+    
+    try {
+      setIsLoading(true);
+      setError('');
+      await login(email, password);
+      // Navigation will be handled by the auth hook
+    } catch (err) {
+      setError('Invalid email or password');
+      console.error('Login error:', err);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -22,53 +44,71 @@ export default function LoginScreen() {
           style={styles.logo}
         />
       </View>
-
+      
       <View style={styles.formContainer}>
-        <Text style={styles.title}>Login By Mail</Text>
-
+        <Text style={styles.title}>Login to Your Account</Text>
+        
+        {error ? <Text style={styles.errorText}>{error}</Text> : null}
+        
         <TextInput
           style={styles.input}
-          placeholder="email@domain.com"
+          placeholder="Email"
           value={email}
-          onChangeText={setEmail}
+          onChangeText={(text) => {
+            setEmail(text);
+            setError('');
+          }}
           keyboardType="email-address"
           autoCapitalize="none"
         />
+        
         <TextInput
           style={styles.input}
           placeholder="Password"
           value={password}
-          onChangeText={setPassword}
-          secureTextEntry={true}
-          autoCapitalize="none"
+          onChangeText={(text) => {
+            setPassword(text);
+            setError('');
+          }}
+          secureTextEntry
         />
-
-
-        <TouchableOpacity style={styles.continueButton} onPress={handleLogin}>
-          <Text style={styles.continueButtonText}>Continue</Text>
+        
+        <TouchableOpacity 
+          style={styles.forgotPasswordContainer}
+          onPress={() => navigation.navigate('ForgotPassword')}
+        >
+          <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
         </TouchableOpacity>
-
+        
+        <TouchableOpacity 
+          style={[styles.loginButton, isLoading && styles.disabledButton]} 
+          onPress={handleLogin}
+          disabled={isLoading}
+        >
+          <Text style={styles.loginButtonText}>
+            {isLoading ? 'Logging in...' : 'Login'}
+          </Text>
+        </TouchableOpacity>
+        
         <Text style={styles.orText}>or</Text>
-
+        
         <TouchableOpacity style={styles.socialButton}>
           <Image source={require('../../assets/images/icon.png')} style={styles.socialIcon} />
           <Text style={styles.socialButtonText}>Continue with Google</Text>
         </TouchableOpacity>
-
+        
         <TouchableOpacity style={styles.socialButton}>
           <Image source={require('../../assets/images/icon.png')} style={styles.socialIcon} />
           <Text style={styles.socialButtonText}>Continue with Apple</Text>
         </TouchableOpacity>
-
-        <Text style={styles.termsText}>
-          By clicking continue, you agree to our <Text style={styles.linkText}>Terms of Service</Text>
-          {' '}and <Text style={styles.linkText}>Privacy Policy</Text>
-        </Text>
       </View>
-
+      
       <View style={styles.footer}>
         <Text style={styles.footerText}>
-          Already have an account ? <Link href="/auth/signup" style={styles.signInLink}>Sign in</Link>
+          Don't have an account? 
+          <TouchableOpacity onPress={() => navigation.navigate('RegisterScreen')}>
+            <Text style={styles.signUpLink}> Sign up</Text>
+          </TouchableOpacity>
         </Text>
       </View>
     </View>
@@ -102,6 +142,11 @@ const styles = StyleSheet.create({
     textAlign: 'left',
     alignSelf: 'flex-start',
   },
+  errorText: {
+    color: 'red',
+    marginBottom: 15,
+    alignSelf: 'flex-start',
+  },
   input: {
     width: '100%',
     height: 50,
@@ -109,10 +154,18 @@ const styles = StyleSheet.create({
     borderColor: '#ddd',
     borderRadius: 8,
     paddingHorizontal: 15,
+    marginBottom: 15,
     fontSize: 16,
+  },
+  forgotPasswordContainer: {
+    alignSelf: 'flex-end',
     marginBottom: 20,
   },
-  continueButton: {
+  forgotPasswordText: {
+    color: '#666',
+    fontSize: 14,
+  },
+  loginButton: {
     width: '100%',
     height: 50,
     backgroundColor: '#000',
@@ -121,7 +174,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 20,
   },
-  continueButtonText: {
+  disabledButton: {
+    backgroundColor: '#999',
+  },
+  loginButtonText: {
     color: '#fff',
     fontSize: 16,
     fontWeight: 'bold',
@@ -149,17 +205,7 @@ const styles = StyleSheet.create({
   },
   socialButtonText: {
     fontSize: 16,
-    color: '#000',
-  },
-  termsText: {
-    fontSize: 12,
-    color: '#666',
-    textAlign: 'center',
-    marginTop: 10,
-  },
-  linkText: {
-    color: '#000',
-    fontWeight: 'bold',
+    color: '#333',
   },
   footer: {
     width: '100%',
@@ -169,9 +215,12 @@ const styles = StyleSheet.create({
   footerText: {
     fontSize: 14,
     color: '#666',
+    flexDirection: 'row',
+    alignItems: 'center',
   },
-  signInLink: {
+  signUpLink: {
     color: '#000',
     fontWeight: 'bold',
+    fontSize: 14,
   },
 });

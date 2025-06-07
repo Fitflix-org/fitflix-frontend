@@ -9,6 +9,7 @@ export default function SignupScreen() {
   const [phone, setPhone] = useState('');
   const [gender, setGender] = useState('');
   const [referralCode, setReferralCode] = useState('');
+  const  { router } = require('expo-router');
 
   const handleSignup = () => {
     // TODO: Implement signup logic
