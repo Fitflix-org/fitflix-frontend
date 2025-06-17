@@ -61,17 +61,24 @@ const activeWays = [
   'TRY A GROUP FITNESS CLASS IN YOUR COMMUNITY'
 ];
 
+import { useAuth } from '../../features/auth/auth-context';
+
 export default function HomeScreen() {
+  const { user } = useAuth();
+  
   return (
     <ScrollView style={styles.container}>
       {/* Header Section */}
       <View style={styles.header}>
-        <TouchableOpacity 
-          style={styles.loginButton}
-          onPress={() => router.push('/auth/login')}
-        >
-          <Text style={styles.loginButtonText}>Login</Text>
-        </TouchableOpacity>
+        <View style={styles.userContainer}>
+          <View style={styles.avatar}>
+            <FontAwesome5 name="user-circle" size={32} color="#FF0000" />
+          </View>
+          <View style={styles.welcomeTextContainer}>
+            <Text style={styles.welcomeText}>Welcome</Text>
+            <Text style={styles.userName}>{user?.name || 'User'}</Text>
+          </View>
+        </View>
         <View style={styles.headerActions}>
           <TouchableOpacity style={styles.iconButton}>
             <FontAwesome5 name="bell" size={20} color="#000" solid />
@@ -216,17 +223,24 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 20,
   },
-  loginButton: {
-    backgroundColor: '#FF0000',
-    paddingVertical: 8,
-    paddingHorizontal: 20,
-    borderRadius: 20,
+  userContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  avatar: {
     marginRight: 10,
   },
-  loginButtonText: {
-    color: '#fff',
+  welcomeTextContainer: {
+    flexDirection: 'column',
+  },
+  welcomeText: {
+    fontSize: 14,
+    color: '#666',
+  },
+  userName: {
     fontSize: 16,
     fontWeight: 'bold',
+    color: '#000',
   },
   headerActions: {
     flexDirection: 'row',

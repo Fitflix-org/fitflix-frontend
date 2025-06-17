@@ -1,21 +1,55 @@
 import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
 import { Link } from 'expo-router';
 import { useState } from 'react';
-import { Image, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Alert, Image, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { useAuth } from '../../features/auth/auth-context';
 
 export default function SignupScreen() {
-  const [name, setName] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [phone, setPhone] = useState('');
   const [gender, setGender] = useState('');
   const [referralCode, setReferralCode] = useState('');
-  const  { router } = require('expo-router');
+  const { router } = require('expo-router');
+  const { signup, isLoading, error } = useAuth();
 
-  const handleSignup = () => {
-    // TODO: Implement signup logic
-    console.log('Signup:', { name, email, phone, gender, referralCode });
-    // Navigate to home page after signup
-    router.push('/(tabs)/home');
+  const handleSignup = async () => {
+    // Validate required fields
+    if (!firstName || !lastName || !email || !password) {
+      Alert.alert('Error', 'Please fill in all required fields');
+      return;
+    }
+    
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      Alert.alert('Error', 'Please enter a valid email address');
+      return;
+    }
+    
+    // Validate password strength
+    if (password.length < 6) {
+      Alert.alert('Error', 'Password must be at least 6 characters long');
+      return;
+    }
+    
+    try {
+      // Call the signup function from auth context
+      await signup({
+        first_name: firstName,
+        last_name: lastName,
+        email,
+        password,
+        phone: phone.length > 0 ? phone : undefined
+      });
+      
+      // Navigation is handled in the signup function after successful registration
+    } catch (err) {
+      console.error('Signup error:', err);
+      // Error handling is done in the auth context
+    }
   };
 
   return (
@@ -34,9 +68,20 @@ export default function SignupScreen() {
           <FontAwesome5 name="user" size={20} color="#666" style={styles.inputIcon} />
           <TextInput
             style={styles.input}
-            placeholder="Your Name"
-            value={name}
-            onChangeText={setName}
+            placeholder="First Name"
+            value={firstName}
+            onChangeText={setFirstName}
+            autoCapitalize="words"
+          />
+        </View>
+        
+        <View style={styles.inputContainer}>
+          <FontAwesome5 name="user" size={20} color="#666" style={styles.inputIcon} />
+          <TextInput
+            style={styles.input}
+            placeholder="Last Name"
+            value={lastName}
+            onChangeText={setLastName}
             autoCapitalize="words"
           />
         </View>
@@ -50,6 +95,17 @@ export default function SignupScreen() {
             onChangeText={setEmail}
             keyboardType="email-address"
             autoCapitalize="none"
+          />
+        </View>
+        
+        <View style={styles.inputContainer}>
+          <FontAwesome5 name="lock" size={20} color="#666" style={styles.inputIcon} />
+          <TextInput
+            style={styles.input}
+            placeholder="Password"
+            value={password}
+            onChangeText={setPassword}
+            secureTextEntry
           />
         </View>
 
@@ -105,8 +161,18 @@ export default function SignupScreen() {
           />
         </View>
 
-        <TouchableOpacity style={styles.continueButton} onPress={handleSignup}>
-          <Text style={styles.continueButtonText}>Sign Up</Text>
+        {error && <Text style={styles.errorText}>{error}</Text>}
+        
+        <TouchableOpacity 
+          style={[styles.continueButton, isLoading && styles.disabledButton]} 
+          onPress={handleSignup}
+          disabled={isLoading}
+        >
+          {isLoading ? (
+            <ActivityIndicator color="#fff" />
+          ) : (
+            <Text style={styles.continueButtonText}>Sign Up</Text>
+          )}
         </TouchableOpacity>
         
         <Text style={styles.termsText}>
@@ -117,7 +183,7 @@ export default function SignupScreen() {
       
       <View style={styles.footer}>
         <Text style={styles.footerText}>
-          Already have an account? <Link href="/auth/signin" style={styles.signInLink}>Sign in</Link>
+          Already have an account? <Link href="/auth/login" style={styles.signInLink}>Login</Link>
         </Text>
       </View>
     </View>
@@ -190,6 +256,12 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     alignSelf: 'flex-start',
   },
+  errorText: {
+    color: 'red',
+    marginBottom: 15,
+    textAlign: 'center',
+    width: '100%',
+  },
   genderContainer: {
     width: '100%',
     flexDirection: 'row',
@@ -222,15 +294,19 @@ const styles = StyleSheet.create({
   continueButton: {
     width: '100%',
     height: 50,
-    backgroundColor: '#000',
+    backgroundColor: '#000000',
     borderRadius: 25,
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 20,
     marginTop: 10,
   },
+  disabledButton: {
+    backgroundColor: '#666',
+    opacity: 0.7,
+  },
   continueButtonText: {
-    color: '#fff',
+    color: '#FFFFFF',
     fontSize: 16,
     fontWeight: 'bold',
   },
@@ -241,8 +317,10 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   linkText: {
-    color: '#000',
-    fontWeight: 'bold',
+    color: '#000000',
+  },
+  signInLink: {
+    color: '#000000',
   },
   footer: {
     width: '100%',

@@ -1,17 +1,27 @@
-import { Link } from 'expo-router';
-import { useState } from 'react';
-import { Image, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Link, router } from 'expo-router';
+import { useEffect, useState } from 'react';
+import { ActivityIndicator, Image, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Routes } from '../../constants/Routes';
 import { useAuth } from '../../features/auth/auth-context';
 
 export default function LoginScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const { login } = useAuth();
+  const { login, isLoading, error, isAuthenticated } = useAuth();
+
+  // Check if user is already authenticated and redirect to home if they are
+  useEffect(() => {
+    if (isAuthenticated) {
+      router.replace(Routes.TABS.HOME);
+    }
+  }, [isAuthenticated]);
 
   const handleLogin = async () => {
+    if (!email || !password) {
+      // Basic validation
+      return;
+    }
     await login(email, password);
-    console.log('Login with email:', email);
-    console.log('Login with password:', password);
   };
 
   return (
@@ -26,6 +36,8 @@ export default function LoginScreen() {
       <View style={styles.formContainer}>
         <Text style={styles.title}>Login By Mail</Text>
 
+        {error && <Text style={styles.errorText}>{error}</Text>}
+
         <TextInput
           style={styles.input}
           placeholder="email@domain.com"
@@ -33,6 +45,7 @@ export default function LoginScreen() {
           onChangeText={setEmail}
           keyboardType="email-address"
           autoCapitalize="none"
+          editable={!isLoading}
         />
         <TextInput
           style={styles.input}
@@ -41,21 +54,30 @@ export default function LoginScreen() {
           onChangeText={setPassword}
           secureTextEntry={true}
           autoCapitalize="none"
+          editable={!isLoading}
         />
 
 
-        <TouchableOpacity style={styles.continueButton} onPress={handleLogin}>
-          <Text style={styles.continueButtonText}>Continue</Text>
+        <TouchableOpacity 
+          style={[styles.continueButton, isLoading && styles.disabledButton]} 
+          onPress={handleLogin}
+          disabled={isLoading}
+        >
+          {isLoading ? (
+            <ActivityIndicator color="#fff" />
+          ) : (
+            <Text style={styles.continueButtonText}>Continue</Text>
+          )}
         </TouchableOpacity>
 
         <Text style={styles.orText}>or</Text>
 
-        <TouchableOpacity style={styles.socialButton}>
+        <TouchableOpacity style={styles.socialButton} disabled={isLoading}>
           <Image source={require('../../assets/images/icon.png')} style={styles.socialIcon} />
           <Text style={styles.socialButtonText}>Continue with Google</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.socialButton}>
+        <TouchableOpacity style={styles.socialButton} disabled={isLoading}>
           <Image source={require('../../assets/images/icon.png')} style={styles.socialIcon} />
           <Text style={styles.socialButtonText}>Continue with Apple</Text>
         </TouchableOpacity>
@@ -68,7 +90,7 @@ export default function LoginScreen() {
 
       <View style={styles.footer}>
         <Text style={styles.footerText}>
-          Already have an account ? <Link href="/auth/signup" style={styles.signInLink}>Sign in</Link>
+          Don't have an account? <Link href="/auth/signup" style={styles.signInLink}>Sign up</Link>
         </Text>
       </View>
     </View>
@@ -99,8 +121,12 @@ const styles = StyleSheet.create({
     fontSize: 28,
     fontWeight: 'bold',
     marginBottom: 30,
-    textAlign: 'left',
-    alignSelf: 'flex-start',
+  },
+  errorText: {
+    color: 'red',
+    marginBottom: 15,
+    textAlign: 'center',
+    width: '100%',
   },
   input: {
     width: '100%',
@@ -108,38 +134,43 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#ddd',
     borderRadius: 8,
+    marginBottom: 15,
     paddingHorizontal: 15,
     fontSize: 16,
-    marginBottom: 20,
   },
   continueButton: {
     width: '100%',
     height: 50,
-    backgroundColor: '#000',
-    borderRadius: 25,
+    backgroundColor: '#000000',
+    borderRadius: 8,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 20,
+    marginTop: 10,
+    color:'#fff',
+  },
+  disabledButton: {
+    backgroundColor: '#cccccc',
+    opacity: 0.7,
   },
   continueButtonText: {
-    color: '#fff',
+    color: '#FFFFFF',
     fontSize: 16,
     fontWeight: 'bold',
   },
   orText: {
+    marginVertical: 20,
     fontSize: 16,
     color: '#666',
-    marginVertical: 15,
   },
   socialButton: {
     width: '100%',
     height: 50,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
     borderWidth: 1,
     borderColor: '#ddd',
-    borderRadius: 25,
+    borderRadius: 8,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
     marginBottom: 15,
   },
   socialIcon: {
@@ -149,29 +180,31 @@ const styles = StyleSheet.create({
   },
   socialButtonText: {
     fontSize: 16,
-    color: '#000',
+    color: '#333',
   },
   termsText: {
     fontSize: 12,
     color: '#666',
     textAlign: 'center',
-    marginTop: 10,
+    marginTop: 20,
+    lineHeight: 18,
   },
   linkText: {
-    color: '#000',
-    fontWeight: 'bold',
+    color: '#000000',
+  },
+  signInLink: {
+    color: '#000000',
   },
   footer: {
-    width: '100%',
     alignItems: 'center',
-    marginBottom: 30,
+    marginBottom: 20,
   },
   footerText: {
     fontSize: 14,
     color: '#666',
   },
   signInLink: {
-    color: '#000',
+    color: '#000000',
     fontWeight: 'bold',
   },
 });

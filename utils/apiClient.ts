@@ -2,7 +2,7 @@ import axios, { AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse } f
 import { getToken } from '../features/auth/storage/tokenStorage';
 
 // Base URL for API requests
-const API_BASE_URL = 'https://api.fitflix.example.com'; // Replace with actual API URL
+const API_BASE_URL = 'https://fitflix-backend-1.onrender.com/api';
 
 /**
  * Create an Axios instance with default configuration
@@ -123,5 +123,7 @@ export type PaginatedResponse<T> = {
 export type ApiErrorResponse = {
   message: string;
   errors?: Record<string, string[]>;
+  status?: number;
+};ing[]>;
   status?: number;
 };
