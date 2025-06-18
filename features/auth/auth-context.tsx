@@ -1,7 +1,7 @@
 import { router } from 'expo-router';
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { Routes } from '../../constants/Routes';
-import { getToken, removeToken, saveToken } from './storage/tokenStorage';
+import { getSessionExpiry, getToken, getUserData, removeToken, saveToken } from './storage/tokenStorage';
 
 // Define the shape of the auth context
 type AuthContextType = {
@@ -50,87 +50,124 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [user, setUser] = useState<User | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  // Clear any existing tokens when the app starts to ensure users always see the login page first
-  useEffect(() => {
-    const clearTokens = async () => {
-      try {
-        await removeToken();
-      } catch (err) {
-        console.error('Error clearing tokens:', err);
-      }
-    };
-    
-    clearTokens();
-  }, []);
+  // We no longer clear tokens on app start to maintain session persistence
+  // This allows users to remain logged in until their session expires
 
-  // Check for existing auth token on mount
+  // Check for existing auth token and session validity on mount
   useEffect(() => {
     const checkAuth = async () => {
       try {
         const token = await getToken();
+        const expiryTimestamp = await getSessionExpiry();
+        
+        // Check if token exists and session is still valid
         if (token) {
-          // In a real app, you would validate the token with your backend
-          // and fetch the user data
-          
-          // For now, we'll try to decode the token to get user info
-          try {
-            // Simple JWT decode (not validation) to extract payload
-            const base64Url = token.split('.')[1];
-            if (base64Url) {
-              const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-              const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
-                return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-              }).join(''));
-              
-              const payload = JSON.parse(jsonPayload);
-              console.log('Token payload:', payload);
-              
-              if (payload.user) {
-                setIsAuthenticated(true);
-                
-                // Extract user data with proper fallbacks
-                const userId = payload.user.id || payload.user._id || '1';
-                
-                // Prioritize first_name and last_name if available
-                let userName;
-                if (payload.user.first_name) {
-                  userName = payload.user.last_name 
-                    ? `${payload.user.first_name} ${payload.user.last_name}` 
-                    : payload.user.first_name;
-                } else if (payload.user.name) {
-                  userName = payload.user.name;
-                } else if (payload.user.username) {
-                  userName = payload.user.username;
-                } else {
-                  userName = 'Demo User';
-                }
-                
-                const userEmail = payload.user.email || 'user@example.com';
-                
-                console.log('Setting user data from token:', { userId, userName, userEmail });
-                
-                setUser({
-                  id: userId,
-                  name: userName,
-                  email: userEmail,
-                });
-                
-                console.log('User set from token:', payload.user);
-                setIsLoading(false);
-                return;
-              }
+          // Check if session has expired
+          if (expiryTimestamp) {
+            const currentTime = Date.now();
+            if (currentTime >= expiryTimestamp) {
+              console.log('Session has expired, logging out');
+              await removeToken(); // Clear expired session
+              setIsLoading(false);
+              return;
             }
-          } catch (decodeErr) {
-            console.error('Error decoding token:', decodeErr);
+            
+            console.log('Session is valid until:', new Date(expiryTimestamp).toLocaleString());
           }
           
-          // Fallback if token decode fails
-          setIsAuthenticated(true);
-          setUser({
-            id: '1',
-            name: 'Demo User',
-            email: 'user@example.com',
-          });
+          // Get stored user data from AsyncStorage
+          const storedUserData = await getUserData();
+          
+          if (storedUserData) {
+            // Use the stored user data
+            console.log('Using stored user data:', storedUserData);
+            setIsAuthenticated(true);
+            setUser(storedUserData);
+            
+            // If authenticated, navigate to home page
+            if (router.canGoBack()) {
+              router.replace(Routes.TABS.HOME);
+            }
+          } else {
+            // Fallback to token decoding if no stored user data
+            try {
+              // Simple JWT decode (not validation) to extract payload
+              const base64Url = token.split('.')[1];
+              if (base64Url) {
+                const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+                const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+                  return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+                }).join(''));
+                
+                const payload = JSON.parse(jsonPayload);
+                console.log('Token payload:', payload);
+                
+                if (payload.user) {
+                  setIsAuthenticated(true);
+                  
+                  // Extract user data with proper fallbacks
+                  const userId = payload.user.id || payload.user._id || '1';
+                  
+                  // Prioritize first_name and last_name if available
+                  let userName;
+                  if (payload.user.first_name) {
+                    userName = payload.user.last_name 
+                      ? `${payload.user.first_name} ${payload.user.last_name}` 
+                      : payload.user.first_name;
+                  } else if (payload.user.name) {
+                    userName = payload.user.name;
+                  } else if (payload.user.username) {
+                    userName = payload.user.username;
+                  } else {
+                    userName = 'Demo User';
+                  }
+                  
+                  const userEmail = payload.user.email || 'user@example.com';
+                  
+                  const userData = {
+                    id: userId,
+                    name: userName,
+                    email: userEmail,
+                  };
+                  
+                  console.log('Setting user data from token:', userData);
+                  
+                  // Save the user data for future use
+                  await saveToken(token, expiryTimestamp, userData);
+                  
+                  setUser(userData);
+                  console.log('User set from token:', payload.user);
+                  
+                  // If authenticated, navigate to home page
+                  if (router.canGoBack()) {
+                    router.replace(Routes.TABS.HOME);
+                  }
+                  
+                  return;
+                }
+              }
+            } catch (decodeErr) {
+              console.error('Error decoding token:', decodeErr);
+            }
+            
+            // Fallback if token decode fails but session is still valid
+            const fallbackUser = {
+              id: '1',
+              name: 'Demo User',
+              email: 'user@example.com',
+            };
+            
+            setIsAuthenticated(true);
+            setUser(fallbackUser);
+            
+            // Save the fallback user data
+            await saveToken(token, expiryTimestamp, fallbackUser);
+            
+            // If authenticated, navigate to home page
+            if (router.canGoBack()) {
+              router.replace(Routes.TABS.HOME);
+            }
+          }
         }
       } catch (err) {
         console.error('Auth check failed:', err);
@@ -163,14 +200,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         throw new Error(data.message || 'Login failed');
       }
       
-      // Save the token from the response
-      await saveToken(data.token);
-      
-      // Update state with user data from response
-      setIsAuthenticated(true);
-      
       // Log the complete response data for debugging
       console.log('Login response data:', JSON.stringify(data, null, 2));
+      
+      // Extract the token and timestamp from the response
+      const token = data.token;
+      const expiryTimestamp = data.timestamp; // The timestamp from the cookie
       
       // Extract user data with proper fallbacks
       const userId = data.user?.id || data.user?._id || '1';
@@ -191,14 +226,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       
       const userEmail = data.user?.email || email;
       
-      console.log('Setting user data:', { userId, userName, userEmail });
-      
-      setUser({
+      // Create user object
+      const userData = {
         id: userId,
         name: userName,
         email: userEmail,
         // Add other user properties as needed
-      });
+      };
+      
+      console.log('Setting user data:', userData);
+      console.log('Session will expire at:', new Date(expiryTimestamp).toLocaleString());
+      
+      // Save the token, expiry timestamp, and user data
+      await saveToken(token, expiryTimestamp, userData);
+      
+      // Update state with user data
+      setIsAuthenticated(true);
+      setUser(userData);
       
       // Navigate to the home screen
       router.replace(Routes.TABS.HOME);
@@ -258,11 +302,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         throw new Error(loginData.message || 'Auto-login after registration failed');
       }
       
-      // Save the token from the login response
-      await saveToken(loginData.token);
+      // Extract the token and timestamp from the response
+      const token = loginData.token;
+      const expiryTimestamp = loginData.timestamp; // The timestamp from the cookie
       
-      // Update state with user data
-      setIsAuthenticated(true);
+      console.log('Session will expire at:', new Date(expiryTimestamp).toLocaleString());
       
       // Log the user data to debug
       console.log('Signup login response data:', loginData);
@@ -291,13 +335,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       
       const userEmail = loginData.user?.email || userData.email;
       
-      console.log('Setting user data after signup:', { userId, userName, userEmail });
-      
-      setUser({
+      // Create user object
+      const userDataObj = {
         id: userId,
         name: userName,
         email: userEmail,
-      });
+      };
+      
+      console.log('Setting user data after signup:', userDataObj);
+      
+      // Save the token, expiry timestamp, and user data
+      await saveToken(token, expiryTimestamp, userDataObj);
+      
+      // Update state with user data
+      setIsAuthenticated(true);
+      setUser(userDataObj);
       
       // Navigate to the home screen
       router.replace(Routes.TABS.HOME);
@@ -312,17 +364,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // Logout function
   const logout = async () => {
     try {
-      // Remove the token
+      // Clear token, session expiry, and user data from storage
       await removeToken();
       
-      // Update state
+      // Reset state
       setIsAuthenticated(false);
       setUser(null);
       
       // Navigate to the login screen
       router.replace(Routes.AUTH.LOGIN);
-    } catch (err) {
-      console.error('Logout failed:', err);
+    } catch (error) {
+      console.error('Error during logout:', error);
     }
   };
 

@@ -1,10 +1,8 @@
 import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { useAuth } from '../../features/auth/auth-context';
 
-const userProfile = {
-  name: 'srujan',
-  email: 'pandirivenkatdillu@gmail.com'
-};
+
 
 const menuItems = [
   { id: '1', title: 'Notification', icon: 'bell' },
@@ -18,6 +16,12 @@ const menuItems = [
 ];
 
 export default function MoreScreen() {
+  const { user, logout } = useAuth();
+  
+  const handleLogout = async () => {
+    await logout();
+  };
+  
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -26,8 +30,8 @@ export default function MoreScreen() {
             <FontAwesome5 name="user" size={30} color="#666" />
           </View>
           <View style={styles.userInfo}>
-            <Text style={styles.userName}>{userProfile.name}</Text>
-            <Text style={styles.userEmail}>{userProfile.email}</Text>
+            <Text style={styles.userName}>{user?.name || 'User'}</Text>
+            <Text style={styles.userEmail}>{user?.email || 'user@example.com'}</Text>
           </View>
           <TouchableOpacity style={styles.editButton}>
             <FontAwesome5 name="edit" size={20} color="#666" />
@@ -47,8 +51,8 @@ export default function MoreScreen() {
           </TouchableOpacity>
         ))}
 
-        <TouchableOpacity style={styles.logoutButton}>
-          <FontAwesome5 name="sign-out-alt" size={20} color="#111827" />
+        <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+          <FontAwesome5 name="sign-out-alt" size={20} color="#ffffff" />
           <Text style={styles.logoutText}>Logout</Text>
         </TouchableOpacity>
       </ScrollView>
@@ -147,7 +151,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#f44336',
+    backgroundColor: '#000000',
     padding: 15,
     borderRadius: 10,
     marginTop: 20,
